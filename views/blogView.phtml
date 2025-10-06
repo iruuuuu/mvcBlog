@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 28px;
+        }
+        .user-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        .new-post-form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .new-post-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .posts-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .post {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .post-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .post-text {
+            color: #34495e;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .no-posts {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mi Blog</h1>
+            <div class="user-info">
+                <span>Hola, <?php echo (is_object($_SESSION['user']) ? $_SESSION['user']->getUsername() : 'Usuario'); ?></span>
+                <a href="index.php?c=user&logout=1" class="logout-btn">Salir</a>
+            </div>
+        </div>
+
+        <div class="new-post-form">
+            <h2>Crear Nueva Publicación</h2>
+            <form method="POST" action="index.php?c=post">
+                <div class="form-group">
+                    <label for="title">Título:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Contenido:</label>
+                    <textarea id="text" name="text" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Publicar</button>
+            </form>
+        </div>
+
+        <div class="posts-section">
+            <h2>Publicaciones</h2>
+            <?php if (count($posts) > 0): ?>
+                <?php foreach ($posts as $post): ?>
+                    <div class="post">
+                        <div class="post-header">
+                            <div>
+                                <h3 class="post-title"><?php echo htmlspecialchars($post->getTitle()); ?></h3>
+                                <div class="post-meta">
+                                    Por <strong><?php echo htmlspecialchars($post->getAuthor()); ?></strong> 
+                                    el <?php echo date('d/m/Y H:i', strtotime($post->getCreatedAt())); ?>
+                                </div>
+                            </div>
+                            <?php if (is_object($_SESSION['user']) && $post->getUserId() == $_SESSION['user']->getId()): ?>
+                                <a href="index.php?c=post&delete=<?php echo $post->getId(); ?>" 
+                                   class="delete-btn" 
+                                   onclick="return confirm('¿Estás seguro de eliminar esta publicación?')">
+                                   Eliminar
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="post-text">
+                            <?php echo nl2br(htmlspecialchars($post->getText())); ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-posts">
+                    <p>No hay publicaciones aún. ¡Sé el primero en publicar!</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</body>
+</html>
