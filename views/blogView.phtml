@@ -171,6 +171,11 @@
 
         <div class="posts-section">
             <h2>Publicaciones</h2>
+            <?php 
+            if (!isset($posts)) {
+                $posts = [];
+            }
+            ?>
             <?php if (count($posts) > 0): ?>
                 <?php foreach ($posts as $post): ?>
                     <div class="post">
