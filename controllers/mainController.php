@@ -14,10 +14,7 @@ if (!isset($_SESSION['user'])) {
 if (isset($_GET['c'])) {
     require_once('controllers/' . $_GET['c'] . 'Controller.php');
 } else {
-    if (!($_SESSION['user'])) {
-        require_once('controllers/userController.php');
-    } else {
-        require_once('controllers/postController.php');
-    }
+    // Por defecto, mostrar el blog (público)
+    require_once('controllers/postController.php');
 }
 ?>

@@ -149,24 +149,14 @@
         <div class="header">
             <h1>Mi Blog</h1>
             <div class="user-info">
-                <span>Hola, <?php echo (is_object($_SESSION['user']) ? $_SESSION['user']->getUsername() : 'Usuario'); ?></span>
-                <a href="index.php?c=user&logout=1" class="logout-btn">Salir</a>
+                <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
+                    <span>Hola, <?php echo $_SESSION['user']->getUsername(); ?></span>
+                    <a href="index.php?c=post&action=create" class="logout-btn" style="background-color: #27ae60;">Nueva Publicación</a>
+                    <a href="index.php?c=user&logout=1" class="logout-btn">Salir</a>
+                <?php else: ?>
+                    <a href="index.php?c=user" class="logout-btn" style="background-color: #27ae60;">Iniciar Sesión</a>
+                <?php endif; ?>
             </div>
-        </div>
-
-        <div class="new-post-form">
-            <h2>Crear Nueva Publicación</h2>
-            <form method="POST" action="index.php?c=post">
-                <div class="form-group">
-                    <label for="title">Título:</label>
-                    <input type="text" id="title" name="title" required>
-                </div>
-                <div class="form-group">
-                    <label for="text">Contenido:</label>
-                    <textarea id="text" name="text" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Publicar</button>
-            </form>
         </div>
 
         <div class="posts-section">
@@ -187,8 +177,8 @@
                                     el <?php echo date('d/m/Y H:i', strtotime($post->getCreatedAt())); ?>
                                 </div>
                             </div>
-                            <?php if (is_object($_SESSION['user']) && $post->getUserId() == $_SESSION['user']->getId()): ?>
-                                <a href="index.php?c=post&delete=<?php echo $post->getId(); ?>" 
+                            <?php if (isset($_SESSION['user']) && is_object($_SESSION['user']) && $post->getUserId() == $_SESSION['user']->getId()): ?>
+                                <a href="index.php?delete=<?php echo $post->getId(); ?>" 
                                    class="delete-btn" 
                                    onclick="return confirm('¿Estás seguro de eliminar esta publicación?')">
                                    Eliminar
@@ -202,7 +192,11 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="no-posts">
-                    <p>No hay publicaciones aún. ¡Sé el primero en publicar!</p>
+                    <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
+                        <p>No hay publicaciones aún. ¡Sé el primero en publicar!</p>
+                    <?php else: ?>
+                        <p>No hay publicaciones aún. <a href="index.php?c=user">Inicia sesión</a> para crear la primera publicación.</p>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
