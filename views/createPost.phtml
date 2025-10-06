@@ -1,165 +1,224 @@
+<?php
+if(!isset($_SESSION['user']) || !is_object($_SESSION['user'])){
+    header('Location: index.php?c=user');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Publicación - Mi Blog</title>
+    <title>Crear Nuevo Post - Blog</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
+
         .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
             max-width: 800px;
-            margin: 0 auto;
+            width: 100%;
         }
+
         .header {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .header h1 {
-            font-size: 28px;
+
+        .user-info p {
+            color: #666;
+            font-size: 0.95rem;
         }
-        .user-info {
-            display: flex;
-            gap: 15px;
-            align-items: center;
+
+        .user-info strong {
+            color: #667eea;
         }
-        .btn {
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            display: inline-block;
-        }
-        .logout-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .logout-btn:hover {
-            background-color: #c0392b;
-        }
-        .back-btn {
-            background-color: #95a5a6;
-            color: white;
-        }
-        .back-btn:hover {
-            background-color: #7f8c8d;
-        }
-        .new-post-form {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .new-post-form h2 {
-            margin-bottom: 25px;
-            color: #333;
-            font-size: 24px;
-        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
+
         .form-group label {
             display: block;
+            color: #333;
+            font-weight: 600;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-            font-size: 14px;
+            font-size: 0.95rem;
         }
+
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
+
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
         .form-group textarea {
-            min-height: 200px;
             resize: vertical;
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            min-height: 200px;
         }
-        .form-actions {
+
+        .button-group {
             display: flex;
             gap: 15px;
-            margin-top: 25px;
+            margin-top: 30px;
         }
-        .submit-btn {
-            background-color: #3498db;
-            color: white;
-            padding: 14px 28px;
+
+        .btn {
+            flex: 1;
+            padding: 14px 30px;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .submit-btn:hover {
-            background-color: #2980b9;
-        }
-        .cancel-link {
-            background-color: #95a5a6;
-            color: white;
-            padding: 14px 28px;
+            transition: all 0.3s ease;
             text-decoration: none;
-            border-radius: 6px;
-            font-size: 16px;
+            text-align: center;
             display: inline-block;
-            transition: background-color 0.3s;
         }
-        .cancel-link:hover {
-            background-color: #7f8c8d;
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #d0d0d0;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Mi Blog</h1>
-            <div class="user-info">
-                <span>Hola, <?php echo $_SESSION['user']->getUsername(); ?></span>
-                <a href="index.php?c=user&logout=1" class="btn logout-btn">Salir</a>
-            </div>
+            <h1>✍️ Crear Nuevo Post</h1>
         </div>
 
-        <div class="new-post-form">
-            <h2>Crear Nueva Publicación</h2>
-            <form method="POST" action="index.php?c=post">
-                <div class="form-group">
-                    <label for="title">Título:</label>
-                    <input type="text" id="title" name="title" placeholder="Escribe un título atractivo..." required>
-                </div>
-                <div class="form-group">
-                    <label for="text">Contenido:</label>
-                    <textarea id="text" name="text" placeholder="Escribe el contenido de tu publicación..." required></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="submit-btn">Publicar</button>
-                    <a href="index.php" class="cancel-link">Volver al Blog</a>
-                </div>
-            </form>
+        <div class="user-info">
+            <p>Publicando como: <strong><?php echo htmlspecialchars($_SESSION['user']->getUsername()); ?></strong></p>
+            <a href="index.php?c=user&logout=1" class="logout-btn">Cerrar Sesión</a>
         </div>
+
+        <form method="POST" action="index.php?c=post">
+            <div class="form-group">
+                <label for="title">Título del Post</label>
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    placeholder="Escribe un título atractivo..." 
+                    required
+                    maxlength="255"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="text">Contenido</label>
+                <textarea 
+                    id="text" 
+                    name="text" 
+                    placeholder="Escribe el contenido de tu post aquí..." 
+                    required
+                ></textarea>
+            </div>
+
+            <div class="button-group">
+                <a href="index.php" class="btn btn-secondary">← Volver al Blog</a>
+                <button type="submit" class="btn btn-primary">Publicar Post 🚀</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>
