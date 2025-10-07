@@ -34,3 +34,37 @@ INSERT INTO post (title, created_at, text, author, user_id) VALUES
 ('Mi primer post', NOW(), 'Este es mi primer post en el blog. ¡Bienvenidos a todos!', 'admin', 1),
 ('Aprendiendo PHP', NOW(), 'Hoy estoy aprendiendo PHP y MVC. Es muy interesante cómo se estructura el código.', 'usuario1', 2),
 ('Blog funcional', NOW(), 'El blog ya está funcionando correctamente. Ahora puedo publicar posts fácilmente.', 'admin', 1);
+
+-- Comentario table
+CREATE TABLE comentarios (
+    id INT NOT NULL AUTO_INCREMENT,
+    texto TEXT NOT NULL, -- Agregamos un campo para el contenido del comentario
+    post_id INT NOT NULL, -- Clave foránea para la tabla 'post'
+    user_id INT NOT NULL, -- Clave foránea para la tabla 'user' (el autor del comentario)
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Opcional: para saber cuándo se hizo el comentario
+
+    PRIMARY KEY (id),
+
+    -- Define la clave foránea para el post
+    FOREIGN KEY (post_id) REFERENCES post(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    -- Define la clave foránea para el usuario (autor del comentario)
+    FOREIGN KEY (user_id) REFERENCES user(id)
+        ON DELETE RESTRICT -- Recomendado: no permitir eliminar un usuario si tiene comentarios
+        ON UPDATE CASCADE
+);
+
+
+-- Insertar comentarios de ejemplo
+INSERT INTO comentarios (texto, post_id, user_id, fecha_creacion) VALUES
+-- Comentarios para el Post 1 ('Mi primer post')
+('¡Felicidades por tu primer post! Se ve muy bien el blog.', 1, 2, NOW()), -- Comentario de 'usuario1'
+('Me parece un excelente inicio, espero ver más contenido pronto.', 1, 3, NOW()), -- Comentario de 'juan'
+
+-- Comentarios para el Post 2 ('Aprendiendo PHP')
+('El enfoque MVC es el camino correcto. ¡Sigue así con PHP!', 2, 1, NOW()), -- Comentario de 'admin'
+
+-- Comentarios para el Post 3 ('Blog funcional')
+('Es genial que ya esté todo operativo. ¡A publicar!', 3, 2, NOW()); -- Comentario de 'usuario1'
