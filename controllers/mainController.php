@@ -3,6 +3,8 @@ require_once('models/Post.php');
 require_once('models/User.php');
 require_once('models/PostRepository.php');
 require_once('models/UserRepositori.php');
+require_once('models/Comment.php');
+require_once('models/CommentRepository.php');
 
 session_start();
 
