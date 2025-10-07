@@ -25,6 +25,19 @@ if(isset($_POST['username']) && isset($_POST['password'])){
     }
 }
 
+if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['password2'])){
+    // Llama a la función y usa su valor de retorno para la condición
+    if(UserRepository::register($_POST['username'], $_POST['password'], $_POST['password2'])){
+        // Si el registro fue exitoso
+        require_once('views/blogView.phtml');
+    }else{
+        // Si el registro falló
+        require_once('views/registerView.phtml');
+    }
+    exit;
+}
+
+
 // --- 3. Verificación de Sesión Activa (redirige si ya está logueado) ---
 if(isset($_SESSION['user']) && is_object($_SESSION['user'])){
     header('Location: index.php?c=post&action=create');
