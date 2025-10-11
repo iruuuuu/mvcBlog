@@ -15,7 +15,16 @@ if (isset($_GET['delete'])) {
         exit;
     }
     
-    $q = 'DELETE FROM post WHERE id=' . $_GET['delete'] . ' AND user_id=' . $_SESSION['user']->getId();
+    $post_id = intval($_GET['delete']);
+    
+    if ($_SESSION['user']->isAdmin()) {
+        // Admin can delete any post
+        $q = 'DELETE FROM post WHERE id=' . $post_id;
+    } else {
+        // Regular users can only delete their own posts
+        $q = 'DELETE FROM post WHERE id=' . $post_id . ' AND user_id=' . $_SESSION['user']->getId();
+    }
+    
     $result = $db->query($q);
     header('Location: index.php');
     exit;

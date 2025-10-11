@@ -22,9 +22,14 @@ if (isset($_GET['delete_comment'])) {
     }
     
     $comment_id = $_GET['delete_comment'];
-    $user_id = $_SESSION['user']->getId();
     
-    CommentRepository::deleteComment($comment_id, $user_id);
+    if ($_SESSION['user']->isAdmin()) {
+        CommentRepository::deleteCommentAdmin($comment_id);
+    } else {
+        $user_id = $_SESSION['user']->getId();
+        CommentRepository::deleteComment($comment_id, $user_id);
+    }
+    
     header('Location: index.php');
     exit;
 }

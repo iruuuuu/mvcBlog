@@ -4,64 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Blog</title>
-
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Mi Blog</h1>
-            <div class="user-info">
-                <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
-                    <span>Hola, <?php echo $_SESSION['user']->getUsername(); ?></span>
-                    <a href="index.php?c=post&action=create" class="logout-btn" style="background-color: #27ae60;">Nueva Publicación</a>
-                    <a href="index.php?c=user&logout=1" class="logout-btn">Salir</a>
+    <h1>Mi Blog</h1>
+    
+    <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
+        <p>Hola, <?php echo $_SESSION['user']->getUsername(); ?>
+        <?php if ($_SESSION['user']->isAdmin()): ?>
+            <strong>(Administrador)</strong>
+        <?php endif; ?>
+        </p>
+        <a href="index.php?c=post&action=create">Nueva Publicación</a>
+        <a href="index.php?c=user&logout=1">Salir</a>
+    <?php else: ?>
+        <a href="index.php?c=user">Iniciar Sesión</a>
+    <?php endif; ?>
+
+    <hr>
+
+    <h2>Publicaciones</h2>
+    <?php 
+    if (!isset($posts)) {
+        $posts = [];
+    }
+    if (!isset($postComments)) {
+        $postComments = [];
+    }
+    ?>
+    
+    <?php if (count($posts) > 0): ?>
+        <?php foreach ($posts as $post): ?>
+            <div style="border: 1px solid #6c6c6cff; padding: 10px; margin: 10px 0;">
+                <h3><?php echo htmlspecialchars($post->getTitle()); ?></h3>
+                <p><strong>Por:</strong> <?php echo htmlspecialchars($post->getAuthor()); ?> 
+                   <strong>Fecha:</strong> <?php echo date('d/m/Y H:i', strtotime($post->getCreatedAt())); ?></p>
+                <p><?php echo nl2br(htmlspecialchars($post->getText())); ?></p>
+                
+                <?php 
+                if (isset($_SESSION['user']) && is_object($_SESSION['user'])): 
+                    if ($_SESSION['user']->isAdmin() || $post->getUserId() == $_SESSION['user']->getId()):
+                ?>
+                    <a href="index.php?delete=<?php echo $post->getId(); ?>" 
+                       onclick="return confirm('¿Estás seguro de eliminar esta publicación?')">
+                       [Eliminar Post]
+                    </a>
+                <?php 
+                    endif;
+                endif; 
+                ?>
+
+                <hr>
+                <h4>Comentarios:</h4>
+                <?php 
+                $comments = isset($postComments[$post->getId()]) ? $postComments[$post->getId()] : [];
+                if (count($comments) > 0): 
+                ?>
+                    <?php foreach ($comments as $comment): ?>
+                        <div style="margin-left: 20px; padding: 5px; border-left: 2px solid #ddd;">
+                            <p><strong><?php echo htmlspecialchars($comment->getUsername()); ?>:</strong> 
+                               <?php echo htmlspecialchars($comment->getTexto()); ?></p>
+                            <small><?php echo date('d/m/Y H:i', strtotime($comment->getFechaCreacion())); ?></small>
+                            
+                            <?php 
+                            if (isset($_SESSION['user']) && is_object($_SESSION['user'])): 
+                                if ($_SESSION['user']->isAdmin() || $comment->getUserId() == $_SESSION['user']->getId()):
+                            ?>
+                                <a href="index.php?delete_comment=<?php echo $comment->getId(); ?>" 
+                                   onclick="return confirm('¿Estás seguro de eliminar este comentario?')">
+                                   [Eliminar]
+                                </a>
+                            <?php 
+                                endif;
+                            endif; 
+                            ?>
+                        </div>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                    <a href="index.php?c=user" class="logout-btn" style="background-color: #27ae60;">Iniciar Sesión</a>
+                    <p style="margin-left: 20px;"><em>No hay comentarios aún.</em></p>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
+                    <form method="POST" action="index.php?c=comment" style="margin-top: 10px;">
+                        <input type="hidden" name="post_id" value="<?php echo $post->getId(); ?>">
+                        <textarea name="comment_text" placeholder="Escribe un comentario..." required></textarea><br>
+                        <button type="submit">Comentar</button>
+                    </form>
                 <?php endif; ?>
             </div>
-        </div>
-
-        <div class="posts-section">
-            <h2>Publicaciones</h2>
-            <?php 
-            if (!isset($posts)) {
-                $posts = [];
-            }
-            ?>
-            <?php if (count($posts) > 0): ?>
-                <?php foreach ($posts as $post): ?>
-                    <div class="post">
-                        <div class="post-header">
-                            <div>
-                                <h3 class="post-title"><?php echo htmlspecialchars($post->getTitle()); ?></h3>
-                                <div class="post-meta">
-                                    Por <strong><?php echo htmlspecialchars($post->getAuthor()); ?></strong> 
-                                    el <?php echo date('d/m/Y H:i', strtotime($post->getCreatedAt())); ?>
-                                </div>
-                            </div>
-                            <?php if (isset($_SESSION['user']) && is_object($_SESSION['user']) && $post->getUserId() == $_SESSION['user']->getId()): ?>
-                                <a href="index.php?delete=<?php echo $post->getId(); ?>" 
-                                   class="delete-btn" 
-                                   onclick="return confirm('¿Estás seguro de eliminar esta publicación?')">
-                                   Eliminar
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                        <div class="post-text">
-                            <?php echo nl2br(htmlspecialchars($post->getText())); ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="no-posts">
-                    <?php if (isset($_SESSION['user']) && is_object($_SESSION['user'])): ?>
-                        <p>No hay publicaciones aún. ¡Sé el primero en publicar!</p>
-                    <?php else: ?>
-                        <p>No hay publicaciones aún. <a href="index.php?c=user">Inicia sesión</a> para crear la primera publicación.</p>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No hay publicaciones aún.</p>
+    <?php endif; ?>
 </body>
 </html>

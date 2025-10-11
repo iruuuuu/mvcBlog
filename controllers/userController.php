@@ -9,28 +9,35 @@ if(isset($_GET['logout'])){
 }
 
 // Login
-if(isset($_POST['username']) && isset($_POST['password'])){
-    $q = 'SELECT * FROM user WHERE username="'.$_POST['username'].'" AND password="'.md5($_POST['password']).'"';
-    $result = $db->query($q);
-
-    if($row = $result->fetch_assoc()){
-        $_SESSION['user'] = new User($row['id'], $row['username']);
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $loginSuccess = UserRepository::login($_POST['username'], $_POST['password']);
+    if ($loginSuccess) {
         header('Location: index.php?c=post&action=create');
         exit;
+    } else {
+        // Opcional: Pasar un mensaje de error a la vista
+        $error = "Nombre de usuario o contraseña incorrectos.";
     }
 }
 
 // Register
 if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['password2'])){
     if(UserRepository::register($_POST['username'], $_POST['password'], $_POST['password2'])){
-        require_once('views/blogView.phtml');
+        // After successful registration, log the user in automatically
+        UserRepository::login($_POST['username'], $_POST['password']);
+        // Redirect to create post page
+        header('Location: index.php?c=post&action=create');
+        exit;
     }else{
-        require_once('views/createPostView.phtml');
+        $error = "Error en el registro. El usuario puede ya existir o las contraseñas no coinciden.";
     }
-    exit;
 }
 
-
+// Show register view
+if(isset($_GET['register'])){
+    require_once('views/registerView.phtml');
+    exit;
+}
 
 // Mostrar vista de login
 require_once('views/loginView.phtml');

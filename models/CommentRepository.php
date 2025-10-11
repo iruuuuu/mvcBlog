@@ -43,5 +43,11 @@ class CommentRepository {
         $q = 'DELETE FROM comentarios WHERE id=' . intval($id) . ' AND user_id=' . intval($user_id);
         return $db->query($q);
     }
+
+    public static function deleteCommentAdmin($id) {
+        $db = Connection::connect();
+        $q = 'DELETE FROM comentarios WHERE id=' . intval($id);
+        return $db->query($q);
+    }
 }
 ?>
